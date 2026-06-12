@@ -65,6 +65,7 @@ npm run dev
 This project is deployed using Vercel.
 
 ##To deploy your own version:
+
 1.Push code to GitHub
 2.Import repo in Vercel
 3.Select React + Vite
