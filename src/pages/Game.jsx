@@ -54,6 +54,19 @@ const isBattle = mode === "battle";
 
   // 🌬 REALISTIC WIND
   const getWind = () => (Math.sin(Date.now() / 800) * 0.6);
+  //mobile design
+  const [isMobile, setIsMobile] = useState(false);
+
+useEffect(() => {
+  const checkSize = () => {
+    setIsMobile(window.innerWidth < 600);
+  };
+
+  checkSize(); // run once
+
+  window.addEventListener("resize", checkSize);
+  return () => window.removeEventListener("resize", checkSize);
+}, []);
 
   // 🎯 LANES
   const getLaneX = () => {
@@ -193,7 +206,6 @@ const createSpecialParticles = (type, x, y) => {
 
 
   //  MOVE
-
 
   useEffect(() => {
   if (gameOver) return;
@@ -574,6 +586,9 @@ return (
       position: "relative",
       height: "100vh",
       transform: shake ? "translate(5px,5px)" : "none",
+      touchAction: "none",
+      overflow: "hidden",  
+      userSelect: "none",  
     }}
   >
     <h1>🎈 Balloon Pop Game </h1>
@@ -581,7 +596,9 @@ return (
     {/* HUD */}
     <div className="hud">
       {!isBattle ? (
-        <div className="hud-box">🎯 Score: {score}</div>
+        <div className="hud-box" style={{
+            fontSize: isMobile ? "14px" : "18px"
+        }}>🎯 Score: {score}</div>
       ) : (
         <>
           <div className="hud-box">🔴 Player 1: {player1Score}</div>
@@ -628,7 +645,7 @@ return (
             position: "absolute",
             left: b.x,
             top: b.y,
-            fontSize: "80px",
+            fontSize: isMobile ? "45px" : "80px",
             cursor: "pointer",
             transition: "transform 0.2s",
             transform: b.popping ? "scale(1.5)" : "scale(1)",
@@ -647,7 +664,7 @@ return (
           position: "absolute",
           left: p.x,
           top: p.y,
-          fontSize: "20px",
+          fontSize: isMobile ? "14px" : "20px",
           pointerEvents: "none",
           opacity: p.life,
         }}
@@ -664,7 +681,7 @@ return (
           position: "absolute",
           left: e.x,
           top: e.y,
-          fontSize: "40px",
+          fontSize: isMobile ? "25px" : "40px",
           pointerEvents: "none",
           zIndex: 1,
         }}
