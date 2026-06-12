@@ -1,0 +1,116 @@
+/* ========== GLOBAL RESET ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* ========== HOME SCREEN ========== */
+.home {
+  min-height: 100vh;
+  background: linear-gradient(to top, #87ceeb, #ffffff);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+  padding: 20px;
+}
+
+.home h1 {
+  font-size: 42px;
+  margin-bottom: 10px;
+  color: #ff4d8d;
+  text-shadow: 1px 1px 5px rgba(0,0,0,0.2);
+}
+
+/* ========== MODE CARDS ========== */
+.card-container {
+  display: flex;
+  gap: 20px;
+  margin: 30px 0;
+}
+
+.card {
+  width: 220px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-8px) scale(1.05);
+}
+
+/* ========== START BUTTON ========== */
+.play-btn {
+  padding: 15px 40px;
+  border: none;
+  border-radius: 40px;
+
+  background: linear-gradient(45deg, #ff4d8d, #ff0066);
+  color: white;
+
+  font-size: 18px;
+  font-weight: bold;
+
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 10px 20px rgba(255, 0, 102, 0.3);
+}
+
+.play-btn:hover {
+  transform: scale(1.08);
+}
+
+/* ========== GAME SCREEN ========== */
+.game {
+  min-height: 100vh;
+  background: linear-gradient(to top, #87ceeb, #ffffff);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  text-align: center;
+  padding: 20px;
+}
+
+/* SCORE BOARD */
+.game h1 {
+  color: #ff4d8d;
+}
+
+.game h2 {
+  margin: 10px;
+}
+
+/* ========== BALLOON ========== */
+.balloon {
+  font-size: 60px;
+  cursor: pointer;
+
+  position: absolute;
+
+  transition: transform 0.15s ease;
+  user-select: none;
+}
+
+.balloon:hover {
+  transform: scale(1.2);
+}
+
+/* POP ANIMATION EFFECT */
+.balloon:active {
+  transform: scale(0.8);
+}
+body {
+  background: red;
+}
