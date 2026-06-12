@@ -515,3 +515,49 @@ html, body {
   width: 100vw;
   height: 100vh;
 }
+.game {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.hud {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px;
+}
+
+.hud-box {
+  font-size: 14px;
+  padding: 8px 12px;
+}
+
+/* MOBILE FIX */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 22px;
+    text-align: center;
+  }
+
+  .play-btn {
+    width: 90%;
+    font-size: 16px;
+  }
+
+  .mode-card {
+    width: 90% !important;
+  }
+
+  .question-box {
+    width: 90%;
+    font-size: 14px;
+  }
+}
+.hud {
+  flex-wrap: wrap;
+}
+.game {
+  touch-action: manipulation;
+}
