@@ -561,3 +561,13 @@ html, body {
 .game {
   touch-action: manipulation;
 }
+@keyframes floatUp {
+  0% {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -120px);
+    opacity: 0;
+  }
+}

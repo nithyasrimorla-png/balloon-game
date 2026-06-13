@@ -29,12 +29,29 @@ export default function Game({ mode,character }) {
   
   const spawnRef = useRef(null);
   const popSound = useRef(null);
+  const correctSound = useRef(null);
+
+
+//balloon pop sound
+
 
 useEffect(() => {
   const audio = new Audio("/assets/sounds/pop.mp3");
   audio.preload = "auto";
   popSound.current = audio;
 }, []);
+
+//correct ans sound
+
+useEffect(() => {
+  const audio = new Audio("/assets/sounds/correct.mp3");
+  audio.preload = "auto";
+  correctSound.current = audio;
+}, []);
+
+
+
+//music in background
 
 useEffect(() => {
   const musicOn = localStorage.getItem("music");
@@ -46,11 +63,12 @@ useEffect(() => {
   if (musicOn === "true") {
     audio.play().catch(() => {});
   }
-
   return () => audio.pause();
 }, []);
 
+
 const isBattle = mode === "battle";
+
 
   // 🌬 REALISTIC WIND
   const getWind = () => (Math.sin(Date.now() / 800) * 0.6);
@@ -68,6 +86,8 @@ useEffect(() => {
   return () => window.removeEventListener("resize", checkSize);
 }, []);
 
+
+
   // 🎯 LANES
   const getLaneX = () => {
     const lanes = [
@@ -77,6 +97,8 @@ useEffect(() => {
     ];
     return lanes[Math.floor(Math.random() * lanes.length)];
   };
+
+
 
   // 🎈 TYPES
   const getType = () => {
@@ -140,10 +162,14 @@ const createSpecialParticles = (type, x, y) => {
     return () => clearInterval(timer);
   }, [time]);
 
+
+
   // ❤️ LIVES
   useEffect(() => {
     if (lives <= 0) setGameOver(true);
   }, [lives]);
+
+
 
   // 🎈 INITIAL
   useEffect(() => {
@@ -158,6 +184,8 @@ const createSpecialParticles = (type, x, y) => {
 
     setBalloons(initial);
   }, []);
+
+
 
   // 🚀 SPAWN
   useEffect(() => {
@@ -184,6 +212,8 @@ const createSpecialParticles = (type, x, y) => {
     return () => clearInterval(spawnRef.current);
   }, [gameOver,paused]);
 
+
+
   // ⬆ SPEED UP
   useEffect(() => {
     const speedUp = setInterval(() => {
@@ -194,15 +224,12 @@ const createSpecialParticles = (type, x, y) => {
   }, []);
 
 
-
   //levelss
   useEffect(() => {
   if (mode === "easy") setSpeed(2);
   else if (mode === "medium") setSpeed(4);
   else if (mode === "hard") setSpeed(6);
 }, [mode]);
-
-
 
 
   //  MOVE
@@ -236,7 +263,6 @@ const createSpecialParticles = (type, x, y) => {
 }, [gameOver, speed, paused]); 
 
 
-
 //emoji useeffect
 useEffect(() => {
   const interval = setInterval(() => {
@@ -260,7 +286,10 @@ useEffect(() => {
 
   return () => clearInterval(interval);
 }, []);
+
+
 //playerss
+
 useEffect(() => {
   if (mode === "battle") {
     setPlayer1Score(0);
@@ -268,6 +297,7 @@ useEffect(() => {
     setActivePlayer(1);
   }
 }, [mode]);
+
 
 //emojis
   
@@ -297,19 +327,23 @@ const getCharacterEffect = () => {
 
 
 //pointsss after guessing ans correctlyyyy
-  const showFloatingText = (text, x = window.innerWidth / 2, y = 200) => {
+  const showFloatingText = (text) => {
   const id = Date.now() + Math.random();
 
   setFloatingText((prev) => [
     ...prev,
-    { id, text, x, y },
+    {
+      id,
+      text,
+      x: window.innerWidth * 0.5,
+      y: window.innerHeight * 0.4,
+    },
   ]);
 
   setTimeout(() => {
     setFloatingText((prev) => prev.filter((t) => t.id !== id));
-  }, 800);
+  }, 1500);
 };
-
 
 // Question for gamee
 const generateQuestion = () => {
@@ -562,7 +596,7 @@ const generateQuestion = () => {
     }, 150);
   };
 
-  // ⭐ PARTICLE ANIMATION LOOP
+  //  PARTICLE ANIMATION LOOP
   useEffect(() => {
     const interval = setInterval(() => {
       setParticles((prev) =>
@@ -579,6 +613,25 @@ const generateQuestion = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+//floating point for correct ans
+const handleCorrectAnswer = () => {
+  setScore((p) => p + 2);
+
+  showFloatingText(
+    "+2 🎉",
+    window.innerWidth / 2,
+    window.innerHeight / 2
+  );
+
+  if (correctSound.current) {
+    correctSound.current.currentTime = 0;
+    correctSound.current.volume = 0.7;
+    correctSound.current.play().catch(() => {});
+  }
+};
+
+
 return (
   <div
     className="game"
@@ -738,8 +791,7 @@ return (
                 className="play-btn"
                 onClick={() => {
                   if (selectedOption === question.answer) {
-                    setScore((p) => p + 2);
-                    showFloatingText("+2 🎉");
+                     handleCorrectAnswer();
                   }
 
                   setSelectedOption("");
@@ -763,8 +815,7 @@ return (
                 className="play-btn"
                 onClick={() => {
                   if (Number(mathInput) === question.answer) {
-                    setScore((p) => p + 2);
-                    showFloatingText("+2 🎉");
+                    handleCorrectAnswer();
                   }
 
                   setMathInput("");
@@ -777,24 +828,36 @@ return (
             </>
           )}
         </div>
-        {floatingText.map((t) => (
-          <div
-            key={t.id}
-            style={{
-              position: "absolute",
-              left: t.x,
-              top: t.y,
-              fontSize: "30px",
-              fontWeight: "bold",
-              color: "gold",
-              animation: "floatUp 0.8s ease-out",
-              pointerEvents: "none",
-              zIndex: 9999,
-            }}
-          >
-            {t.text}
-          </div>
-        ))}
+        {floatingText.length > 0 && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            zIndex: 999999999,
+            pointerEvents: "none",
+          }}
+        >
+          {floatingText.map((t) => (
+            <div
+              key={t.id}
+              style={{
+                position: "absolute",
+                left: "50%",
+                top: "50%",
+                transform: "translate(-50%, -50%)",
+                fontSize: "60px",
+                color: "gold",
+                background: "black",
+              }}
+            >
+              {t.text}
+            </div>
+          ))}
+        </div>
+      )}
       </div>
     )}
 
