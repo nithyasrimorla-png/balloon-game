@@ -31,6 +31,7 @@ export default function Game({ mode,character }) {
   const spawnRef = useRef(null);
   const popSound = useRef(null);
   const correctSound = useRef(null);
+  const wrongSound = useRef(null);
 
 
 //screen heightt on all devices
@@ -60,7 +61,13 @@ useEffect(() => {
   correctSound.current = audio;
 }, []);
 
-
+//wrong answer sound
+useEffect(() => {
+  const audio = new Audio("/assets/sounds/wrong.mp3");
+  audio.preload = "auto";
+  audio.load();
+  wrongSound.current = audio;
+}, []);
 
 //music in background
 
@@ -350,11 +357,37 @@ const getCharacterEffect = () => {
       y: window.innerHeight * 0.4,
     },
   ]);
-
+  
   setTimeout(() => {
     setFloatingText((prev) => prev.filter((t) => t.id !== id));
   }, 1500);
+}; 
+
+const playWrong = () => {
+  const audio = wrongSound.current;
+  if (!audio) return;
+
+  audio.pause();
+  audio.currentTime = 0;
+
+  requestAnimationFrame(() => {
+    audio.play().catch(() => {});
+  });
 };
+
+//wroong ans handler
+const handleWrongAnswer = () => {
+  const audio = wrongSound.current;
+  if (audio) {
+    audio.pause();
+    audio.currentTime = 0.8;
+
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {});
+    }
+  }
+}; 
 
 // Question for gamee
 const generateQuestion = () => {
@@ -629,18 +662,19 @@ const generateQuestion = () => {
 const handleCorrectAnswer = () => {
   setScore((p) => p + 2);
 
-  showFloatingText(
-    "+2 🎉",
-    window.innerWidth / 2,
-    window.innerHeight / 2
-  );
+  showFloatingText("+2 🎉");
 
   if (correctSound.current) {
     correctSound.current.currentTime = 0;
     correctSound.current.volume = 0.7;
     correctSound.current.play().catch(() => {});
   }
-};
+  if (wrongSound.current) {
+  wrongSound.current.pause();
+  wrongSound.current.currentTime = 0;
+}
+}
+  
 
 
 return (
@@ -814,6 +848,8 @@ return (
                 onClick={() => {
                   if (selectedOption === question.answer) {
                      handleCorrectAnswer();
+                  }else {
+                    handleWrongAnswer();
                   }
 
                   setSelectedOption("");
@@ -838,7 +874,10 @@ return (
                 onClick={() => {
                   if (Number(mathInput) === question.answer) {
                     handleCorrectAnswer();
+                  }else {
+                    handleWrongAnswer();
                   }
+
 
                   setMathInput("");
                   setShowQuestion(false);
@@ -870,8 +909,9 @@ return (
                 left: "50%",
                 top: "50%",
                 transform: "translate(-50%, -50%)",
-                fontSize: "60px",
-                color: "gold",
+                fontSize: t.small ? "30px" : (isMobile ? "40px" : "60px"),
+                color: t.small ? "red" : "gold",
+                textShadow: t.small ? "0 0 10px red" : "0 0 15px gold",
                 background: "black",
               }}
             >
@@ -884,4 +924,5 @@ return (
     )}
 
   </div>
-)};
+);
+}
