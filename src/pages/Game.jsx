@@ -25,6 +25,7 @@ export default function Game({ mode,character }) {
   const [floatingText, setFloatingText] = useState([]);
   const [mathInput, setMathInput] = useState("");
   const [selectedOption, setSelectedOption] = useState("");
+  const [screenHeight, setScreenHeight] = useState(window.innerHeight);
   
   
   const spawnRef = useRef(null);
@@ -32,8 +33,18 @@ export default function Game({ mode,character }) {
   const correctSound = useRef(null);
 
 
-//balloon pop sound
+//screen heightt on all devices
+useEffect(() => {
+  const handleResize = () => {
+    setScreenHeight(window.innerHeight);
+  };
 
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
+
+
+//balloon pop sound
 
 useEffect(() => {
   const audio = new Audio("/assets/sounds/pop.mp3");
@@ -634,23 +645,34 @@ const handleCorrectAnswer = () => {
 
 return (
   <div
-    className="game"
-    style={{
-      position: "relative",
-      height: "100vh",
-      transform: shake ? "translate(5px,5px)" : "none",
-      touchAction: "none",
-      overflow: "hidden",  
-      userSelect: "none",  
-    }}
-  >
+  className="game"
+  style={{
+    position: "relative",
+    height: screenHeight,
+    width: "100vw",
+    transform: shake ? "translate(5px,5px)" : "none",
+    touchAction: "manipulation",
+    overflow: "hidden",
+    userSelect: "none",
+    WebkitUserSelect: "none",
+  }}
+>
     <h1>🎈 Balloon Pop Game </h1>
 
     {/* HUD */}
-    <div className="hud">
+    <div className="hud" style={{
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        gap: "6px",
+        padding: "8px",
+      }}
+    >
       {!isBattle ? (
         <div className="hud-box" style={{
-            fontSize: isMobile ? "14px" : "18px"
+          fontSize: isMobile ? "12px" : "18px",
+          padding: isMobile ? "6px 10px" : "10px 14px",
+        
         }}>🎯 Score: {score}</div>
       ) : (
         <>
@@ -693,7 +715,7 @@ return (
       balloons.map((b) => (
         <div
           key={b.id}
-          onClick={() => handleBalloonClick(b.id)}
+          onPointerDown={() => handleBalloonClick(b.id)}
           style={{
             position: "absolute",
             left: b.x,
