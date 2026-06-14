@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 
 
-export default function Game({ mode,character }) {
+export default function Game({ mode, character }) {
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(30);
   const [gameOver, setGameOver] = useState(false);
@@ -11,81 +11,80 @@ export default function Game({ mode,character }) {
   const [player1Score, setPlayer1Score] = useState(0);
   const [player2Score, setPlayer2Score] = useState(0);
   const [activePlayer, setActivePlayer] = useState(1);
-  
+
 
   const [balloons, setBalloons] = useState([]);
-  const [particles, setParticles] = useState([]); 
+  const [particles, setParticles] = useState([]);
   const [speed, setSpeed] = useState(3);
   const [combo, setCombo] = useState(0);
   const [sideEmojis, setSideEmojis] = useState([]);
   const [shake, setShake] = useState(false);
-  const[paused,setPaused] = useState(false);
+  const [paused, setPaused] = useState(false);
   const [showQuestion, setShowQuestion] = useState(false);
   const [question, setQuestion] = useState(null);
-  const [floatingText, setFloatingText] = useState([]);
   const [mathInput, setMathInput] = useState("");
   const [selectedOption, setSelectedOption] = useState("");
   const [screenHeight, setScreenHeight] = useState(window.innerHeight);
-  
-  
+
+
   const spawnRef = useRef(null);
   const popSound = useRef(null);
   const correctSound = useRef(null);
   const wrongSound = useRef(null);
 
   if (time <= 0) setGameOver(true);
-//screen heightt on all devices
-useEffect(() => {
-  const handleResize = () => {
-    setScreenHeight(window.innerHeight);
-  };
+  //screen heightt on all devices
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenHeight(window.innerHeight);
+    };
 
-  window.addEventListener("resize", handleResize);
-  return () => window.removeEventListener("resize", handleResize);
-}, []);
-
-
-//balloon pop sound
-
-useEffect(() => {
-  const audio = new Audio("/assets/sounds/pop.mp3");
-  audio.preload = "auto";
-  popSound.current = audio;
-}, []);
-
-//correct ans sound
-
-useEffect(() => {
-  const audio = new Audio("/assets/sounds/correct.mp3");
-  audio.preload = "auto";
-  correctSound.current = audio;
-}, []);
-
-//wrong answer sound
-useEffect(() => {
-  const audio = new Audio("/assets/sounds/wrong.mp3");
-  audio.preload = "auto";
-  audio.load();
-  wrongSound.current = audio;
-}, []);
-
-//music in background
-
-useEffect(() => {
-  const musicOn = localStorage.getItem("music");
-
-  const audio = new Audio("/assets/sounds/bg.mp3");
-  audio.loop = true;
-  audio.volume = 0.5;
-
-  if (musicOn === "true") {
-    audio.play().catch(() => {});
-  }
-  return () => audio.pause();
-}, []);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
 
-const isBattle = mode === "battle";
+  //balloon pop sound
+
+  useEffect(() => {
+    const audio = new Audio("/assets/sounds/pop.mp3");
+    audio.preload = "auto";
+    popSound.current = audio;
+  }, []);
+
+  //correct ans sound
+
+  useEffect(() => {
+    const audio = new Audio("/assets/sounds/correct.mp3");
+    audio.preload = "auto";
+    correctSound.current = audio;
+  }, []);
+
+  //wrong answer sound
+  useEffect(() => {
+    const audio = new Audio("/assets/sounds/wrong.mp3");
+    audio.preload = "auto";
+    audio.load();
+    wrongSound.current = audio;
+  }, []);
+
+  //music in background
+
+  useEffect(() => {
+    const musicOn = localStorage.getItem("music");
+
+    const audio = new Audio("/assets/sounds/bg.mp3");
+    audio.loop = true;
+    audio.volume = 0.5;
+
+    if (musicOn === "true") {
+      audio.play().catch(() => { });
+    }
+    return () => audio.pause();
+  }, []);
+
+
+  const isBattle = mode === "battle";
 
 
   // 🌬 REALISTIC WIND
@@ -93,16 +92,16 @@ const isBattle = mode === "battle";
   //mobile design
   const [isMobile, setIsMobile] = useState(false);
 
-useEffect(() => {
-  const checkSize = () => {
-    setIsMobile(window.innerWidth < 600);
-  };
+  useEffect(() => {
+    const checkSize = () => {
+      setIsMobile(window.innerWidth < 600);
+    };
 
-  checkSize(); // run once
+    checkSize(); // run once
 
-  window.addEventListener("resize", checkSize);
-  return () => window.removeEventListener("resize", checkSize);
-}, []);
+    window.addEventListener("resize", checkSize);
+    return () => window.removeEventListener("resize", checkSize);
+  }, []);
 
 
 
@@ -140,59 +139,59 @@ useEffect(() => {
     if (type === "gold") return "🟡✨";
     return "🎈";
   };
-  
+
   const getSideEmoji = () => {
-  const list = ["🌟", "⭐", "🦋", "💖","💙", "💚", "💛", "🌈",  "🔥", "⚡", "🍀", "🎯"];
-  return list[Math.floor(Math.random() * list.length)];
-};
+    const list = ["🌟", "⭐", "🦋", "💖", "💙", "💚", "💛", "🌈", "🔥", "⚡", "🍀", "🎯"];
+    return list[Math.floor(Math.random() * list.length)];
+  };
 
 
-//seperate particless
-const createSpecialParticles = (type, x, y) => {
-  let icon = "💥";
+  //seperate particless
+  const createSpecialParticles = (type, x, y) => {
+    let icon = "💥";
 
-  if (type === "gold") icon = "⭐";
-  if (type === "diamond") icon = "💎";
-  if (type === "bomb") icon = "💥";
+    if (type === "gold") icon = "⭐";
+    if (type === "diamond") icon = "💎";
+    if (type === "bomb") icon = "💥";
 
-  const pieces = Array.from({ length: 12 }, () => ({
-    id: Math.random(),
-    x,
-    y,
-    icon,
-    vx: (Math.random() - 0.5) * 6,
-    vy: (Math.random() - 0.5) * 6,
-    life: 1,
-  }));
+    const pieces = Array.from({ length: 12 }, () => ({
+      id: Math.random(),
+      x,
+      y,
+      icon,
+      vx: (Math.random() - 0.5) * 6,
+      vy: (Math.random() - 0.5) * 6,
+      life: 1,
+    }));
 
-  setParticles((prev) => [...prev, ...pieces]);
-};
+    setParticles((prev) => [...prev, ...pieces]);
+  };
 
 
-const winner =
-  player1Score > player2Score
-    ? "Player 1"
-    : player2Score > player1Score
-    ? "Player 2"
-    : "Draw";
+  const winner =
+    player1Score > player2Score
+      ? "Player 1"
+      : player2Score > player1Score
+        ? "Player 2"
+        : "Draw";
 
   // ⏱ TIMER
   useEffect(() => {
-  if (gameOver || paused) return;
+    if (gameOver || paused) return;
 
-  const timer = setInterval(() => {
-    setTime((p) => {
-      if (p <= 1) {
-        clearInterval(timer);
-        setGameOver(true);
-        return 0;
-      }
-      return p - 1;
-    });
-  }, 1000);
+    const timer = setInterval(() => {
+      setTime((p) => {
+        if (p <= 1) {
+          clearInterval(timer);
+          setGameOver(true);
+          return 0;
+        }
+        return p - 1;
+      });
+    }, 1000);
 
-  return () => clearInterval(timer);
-}, [gameOver, paused]);
+    return () => clearInterval(timer);
+  }, [gameOver, paused]);
 
 
   // ❤️ LIVES
@@ -220,7 +219,7 @@ const winner =
 
   // 🚀 SPAWN
   useEffect(() => {
-    if (gameOver || paused ) return;
+    if (gameOver || paused) return;
 
     spawnRef.current = setInterval(() => {
       setBalloons((prev) => {
@@ -241,7 +240,7 @@ const winner =
     }, 350);
 
     return () => clearInterval(spawnRef.current);
-  }, [gameOver,paused]);
+  }, [gameOver, paused]);
 
 
 
@@ -257,338 +256,338 @@ const winner =
 
   //levelss
   useEffect(() => {
-  if (mode === "easy") setSpeed(2);
-  else if (mode === "medium") setSpeed(4);
-  else if (mode === "hard") setSpeed(6);
-}, [mode]);
+    if (mode === "easy") setSpeed(2);
+    else if (mode === "medium") setSpeed(4);
+    else if (mode === "hard") setSpeed(6);
+  }, [mode]);
 
 
   //  MOVE
 
   useEffect(() => {
-  if (gameOver) return;
+    if (gameOver) return;
 
-  const move = setInterval(() => {
-    if (paused) return;
+    const move = setInterval(() => {
+      if (paused) return;
 
-    setBalloons((prev) => {
-      return prev
-        .map((b) => {
-          const newY = b.y - speed;
-          const newX = b.x + (b.vx || 0);
+      setBalloons((prev) => {
+        return prev
+          .map((b) => {
+            const newY = b.y - speed;
+            const newX = b.x + (b.vx || 0);
 
-          if (newY <= -120) {
-            setLives((l) => l - 1);
-            setShake(true);
-            setTimeout(() => setShake(false), 150);
-            return null;
-          }
+            if (newY <= -120) {
+              setLives((l) => l - 1);
+              setShake(true);
+              setTimeout(() => setShake(false), 150);
+              return null;
+            }
 
-          return { ...b, y: newY, x: newX };
-        })
-        .filter(Boolean);
-    });
-  }, 30);
+            return { ...b, y: newY, x: newX };
+          })
+          .filter(Boolean);
+      });
+    }, 30);
 
-  return () => clearInterval(move);
-}, [gameOver, speed, paused]); 
-
-
-//emoji useeffect
-useEffect(() => {
-  const interval = setInterval(() => {
-    setSideEmojis((prev) => {
-      if (prev.length > 30) return prev;
-
-      const fromLeft = Math.random() < 0.5;
-
-      return [
-        ...prev,
-        {
-          id: Date.now() + Math.random(),
-          emoji: getSideEmoji(),
-          x: fromLeft ? -50 : window.innerWidth + 50,
-          y: Math.random() * window.innerHeight,
-          vx: fromLeft ? 2 : -2,
-        },
-      ];
-    });
-  }, 800);
-
-  return () => clearInterval(interval);
-}, []);
+    return () => clearInterval(move);
+  }, [gameOver, speed, paused]);
 
 
-//playerss
+  //emoji useeffect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSideEmojis((prev) => {
+        if (prev.length > 30) return prev;
 
-useEffect(() => {
-  if (mode === "battle") {
-    setPlayer1Score(0);
-    setPlayer2Score(0);
-    setActivePlayer(1);
-  }
-}, [mode]);
+        const fromLeft = Math.random() < 0.5;
 
+        return [
+          ...prev,
+          {
+            id: Date.now() + Math.random(),
+            emoji: getSideEmoji(),
+            x: fromLeft ? -50 : window.innerWidth + 50,
+            y: Math.random() * window.innerHeight,
+            vx: fromLeft ? 2 : -2,
+          },
+        ];
+      });
+    }, 800);
 
-//emojis
-  
-useEffect(() => {
-  const move = setInterval(() => {
-    setSideEmojis((prev) =>
-      prev
-        .map((e) => ({
-          ...e,
-          x: e.x + e.vx,
-        }))
-        .filter((e) => e.x > -100 && e.x < window.innerWidth + 100)
-    );
-  }, 16);
-
-  return () => clearInterval(move);
-}, []);
- 
-
-const getCharacterEffect = () => {
-  if (character === "🐱") return "🐾";
-  if (character === "🐶") return "🦴";
-  if (character === "🐼") return "🎋";
-  if (character === "🦊") return "🔥";
-  return "💥";
-};
+    return () => clearInterval(interval);
+  }, []);
 
 
-//pointsss after guessing ans correctlyyyy
-  const showFloatingText = (text) => {
-  const id = Date.now() + Math.random();
+  //playerss
 
-  setFloatingText((prev) => [
-    ...prev,
-    {
-      id,
-      text,
-      x: window.innerWidth * 0.5,
-      y: window.innerHeight * 0.4,
-    },
-  ]);
-  
-  setTimeout(() => {
-    setFloatingText((prev) => prev.filter((t) => t.id !== id));
-  }, 1500);
-}; 
-
-const playWrong = () => {
-  const audio = wrongSound.current;
-  if (!audio) return;
-
-  audio.pause();
-  audio.currentTime = 0;
-
-  requestAnimationFrame(() => {
-    audio.play().catch(() => {});
-  });
-};
-
-//wroong ans handler
-const handleWrongAnswer = () => {
-  const audio = wrongSound.current;
-  if (audio) {
-    audio.pause();
-    audio.currentTime = 0.8;
-
-    const playPromise = audio.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {});
+  useEffect(() => {
+    if (mode === "battle") {
+      setPlayer1Score(0);
+      setPlayer2Score(0);
+      setActivePlayer(1);
     }
-  }
-}; 
+  }, [mode]);
 
-// Question for gamee
-const generateQuestion = () => {
-  const type = Math.random() < 0.5 ? "math" : "gk";
 
-  // 🧠 GK QUESTIONS
-  const gkQuestions = [
-    {
-      text: "Capital of India?",
-      options: ["Delhi", "Mumbai", "Chennai", "Kolkata"],
-      answer: "Delhi",
-    },
-    {
-      text: "National animal of India?",
-      options: ["Lion", "Tiger", "Elephant", "Leopard"],
-      answer: "Tiger",
-    },
-    {
-      text: "Which is a fruit?",
-      options: ["Carrot", "Potato", "Apple", "Onion"],
-      answer: "Apple",
-    },
-    {
-      text: "National bird of India?",
-      options: ["Peacock", "Parrot", "Sparrow", "Eagle"],
-      answer: "Peacock",
-    },
-    {
-      text: "How many days are there in a leap year?",
-      options: ["365", "366", "364", "367"],
-      answer: "366",
-    },
-    {
-      text: "Which planet is known as the Red Planet?",
-      options: ["Earth", "Mars", "Jupiter", "Venus"],
-      answer: "Mars",
-    },
-    {
-      text: "Which is the largest ocean on Earth?",
-      options: ["Atlantic", "Indian", "Arctic", "Pacific"],
-      answer: "Pacific",
-    },
-    {
-      text: "Which gas do plants absorb?",
-      options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"],
-      answer: "Carbon Dioxide",
-    },
-    {
-      text: "Who is known as the Father of the Nation (India)?",
-      options: ["Jawaharlal Nehru", "Mahatma Gandhi", "Subhash Chandra Bose", "B. R. Ambedkar"],
-      answer: "Mahatma Gandhi",
-    },
-    {
-      text: "Which is the smallest prime number?",
-      options: ["0", "1", "2", "3"],
-      answer: "2",
-    },
-    {
-      text: "Which is the largest continent?",
-      options: ["Africa", "Asia", "Europe", "Australia"],
-      answer: "Asia",
-    },
-    {
-      text: "What is the capital of Japan?",
-      options: ["Seoul", "Beijing", "Tokyo", "Bangkok"],
-      answer: "Tokyo",
-    },
-    {
-      text: "Which is the fastest land animal?",
-      options: ["Lion", "Cheetah", "Horse", "Leopard"],
-      answer: "Cheetah",
-    },
-    {
-      text: "How many colors are there in a rainbow?",
-      options: ["5", "6", "7", "8"],
-      answer: "7",
-    },
-    {
-      text: "Which is the hardest natural substance?",
-      options: ["Gold", "Iron", "Diamond", "Silver"],
-      answer: "Diamond",
-    },
-    {
-      text: "Which organ pumps blood in the human body?",
-      options: ["Brain", "Heart", "Lungs", "Liver"],
-      answer: "Heart",
-    },
-    {
-      text: "Which is the largest mammal?",
-      options: ["Elephant", "Blue Whale", "Giraffe", "Shark"],
-      answer: "Blue Whale",
-    },
-    {
-      text: "Which planet is closest to the Sun?",
-      options: ["Venus", "Earth", "Mercury", "Mars"],
-      answer: "Mercury",
-    },
-    {
-      text: "Which is the longest river in the world?",
-      options: ["Amazon", "Nile", "Ganga", "Yangtze"],
-      answer: "Nile",
-    },
-    {
-      text: "What is H2O commonly known as?",
-      options: ["Salt", "Oxygen", "Water", "Hydrogen"],
-      answer: "Water",
-    },
-    {
-      text: "Which country is known as the Land of Rising Sun?",
-      options: ["India", "Japan", "China", "Thailand"],
-      answer: "Japan",
-    },
-    {
-      text: "Which is the largest planet in our solar system?",
-      options: ["Earth", "Jupiter", "Saturn", "Neptune"],
-      answer: "Jupiter",
-    },
-    {
-      text: "Which is the main source of energy for Earth?",
-      options: ["Moon", "Sun", "Stars", "Wind"],
-      answer: "Sun",
-    },
-    {
-      text: "Which is the national flower of India?",
-      options: ["Rose", "Lotus", "Sunflower", "Lily"],
-      answer: "Lotus",
-    },
-    {
-      text: "Which metal is liquid at room temperature?",
-      options: ["Iron", "Mercury", "Copper", "Aluminium"],
-      answer: "Mercury",
-    },
+  //emojis
 
-  ];
+  useEffect(() => {
+    const move = setInterval(() => {
+      setSideEmojis((prev) =>
+        prev
+          .map((e) => ({
+            ...e,
+            x: e.x + e.vx,
+          }))
+          .filter((e) => e.x > -100 && e.x < window.innerWidth + 100)
+      );
+    }, 16);
 
-  // ➗ MATH QUESTION
-  const a = Math.floor(Math.random() * 10) + 1;
-  const b = Math.floor(Math.random() * 10) + 1;
+    return () => clearInterval(move);
+  }, []);
 
-  const ops = ["+", "-", "×", "÷"];
-  const op = ops[Math.floor(Math.random() * ops.length)];
 
-  let mathQuestion = null;
+  const getCharacterEffect = () => {
+    if (character === "🐱") return "🐾";
+    if (character === "🐶") return "🦴";
+    if (character === "🐼") return "🎋";
+    if (character === "🦊") return "🔥";
+    return "💥";
+  };
 
-  if (op === "+") {
-    mathQuestion = {
-      text: `${a} + ${b} = ?`,
-      answer: a + b,
-    };
-  }
 
-  if (op === "-") {
-    mathQuestion = {
-      text: `${a} - ${b} = ?`,
-      answer: a - b,
-    };
-  }
+  //pointsss after guessing ans correctlyyyy
+  const showFloatingText = (text) => {
+    const id = Date.now() + Math.random();
 
-  if (op === "×") {
-    mathQuestion = {
-      text: `${a} × ${b} = ?`,
-      answer: a * b,
-    };
-  }
+    setFloatingText((prev) => [
+      ...prev,
+      {
+        id,
+        text,
+        x: window.innerWidth * 0.5,
+        y: window.innerHeight * 0.4,
+      },
+    ]);
 
-  if (op === "÷") {
-    const product = a * b;
-    mathQuestion = {
-      text: `${product} ÷ ${a} = ?`,
-      answer: b,
-    };
-  }
-  
+    setTimeout(() => {
+      setFloatingText((prev) => prev.filter((t) => t.id !== id));
+    }, 1500);
+  };
 
-  // 🎯 FINAL PICK
-  if (type === "math") {
-    return {
-      type: "math",
-      ...mathQuestion,
-    };
-  } else {
-    const q = gkQuestions[Math.floor(Math.random() * gkQuestions.length)];
-    return {
-      type: "gk",
-      ...q,
-    };
-  }
-};
+  const playWrong = () => {
+    const audio = wrongSound.current;
+    if (!audio) return;
+
+    audio.pause();
+    audio.currentTime = 0;
+
+    requestAnimationFrame(() => {
+      audio.play().catch(() => { });
+    });
+  };
+
+  //wroong ans handler
+  const handleWrongAnswer = () => {
+    const audio = wrongSound.current;
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0.8;
+
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => { });
+      }
+    }
+  };
+
+  // Question for gamee
+  const generateQuestion = () => {
+    const type = Math.random() < 0.5 ? "math" : "gk";
+
+    // 🧠 GK QUESTIONS
+    const gkQuestions = [
+      {
+        text: "Capital of India?",
+        options: ["Delhi", "Mumbai", "Chennai", "Kolkata"],
+        answer: "Delhi",
+      },
+      {
+        text: "National animal of India?",
+        options: ["Lion", "Tiger", "Elephant", "Leopard"],
+        answer: "Tiger",
+      },
+      {
+        text: "Which is a fruit?",
+        options: ["Carrot", "Potato", "Apple", "Onion"],
+        answer: "Apple",
+      },
+      {
+        text: "National bird of India?",
+        options: ["Peacock", "Parrot", "Sparrow", "Eagle"],
+        answer: "Peacock",
+      },
+      {
+        text: "How many days are there in a leap year?",
+        options: ["365", "366", "364", "367"],
+        answer: "366",
+      },
+      {
+        text: "Which planet is known as the Red Planet?",
+        options: ["Earth", "Mars", "Jupiter", "Venus"],
+        answer: "Mars",
+      },
+      {
+        text: "Which is the largest ocean on Earth?",
+        options: ["Atlantic", "Indian", "Arctic", "Pacific"],
+        answer: "Pacific",
+      },
+      {
+        text: "Which gas do plants absorb?",
+        options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"],
+        answer: "Carbon Dioxide",
+      },
+      {
+        text: "Who is known as the Father of the Nation (India)?",
+        options: ["Jawaharlal Nehru", "Mahatma Gandhi", "Subhash Chandra Bose", "B. R. Ambedkar"],
+        answer: "Mahatma Gandhi",
+      },
+      {
+        text: "Which is the smallest prime number?",
+        options: ["0", "1", "2", "3"],
+        answer: "2",
+      },
+      {
+        text: "Which is the largest continent?",
+        options: ["Africa", "Asia", "Europe", "Australia"],
+        answer: "Asia",
+      },
+      {
+        text: "What is the capital of Japan?",
+        options: ["Seoul", "Beijing", "Tokyo", "Bangkok"],
+        answer: "Tokyo",
+      },
+      {
+        text: "Which is the fastest land animal?",
+        options: ["Lion", "Cheetah", "Horse", "Leopard"],
+        answer: "Cheetah",
+      },
+      {
+        text: "How many colors are there in a rainbow?",
+        options: ["5", "6", "7", "8"],
+        answer: "7",
+      },
+      {
+        text: "Which is the hardest natural substance?",
+        options: ["Gold", "Iron", "Diamond", "Silver"],
+        answer: "Diamond",
+      },
+      {
+        text: "Which organ pumps blood in the human body?",
+        options: ["Brain", "Heart", "Lungs", "Liver"],
+        answer: "Heart",
+      },
+      {
+        text: "Which is the largest mammal?",
+        options: ["Elephant", "Blue Whale", "Giraffe", "Shark"],
+        answer: "Blue Whale",
+      },
+      {
+        text: "Which planet is closest to the Sun?",
+        options: ["Venus", "Earth", "Mercury", "Mars"],
+        answer: "Mercury",
+      },
+      {
+        text: "Which is the longest river in the world?",
+        options: ["Amazon", "Nile", "Ganga", "Yangtze"],
+        answer: "Nile",
+      },
+      {
+        text: "What is H2O commonly known as?",
+        options: ["Salt", "Oxygen", "Water", "Hydrogen"],
+        answer: "Water",
+      },
+      {
+        text: "Which country is known as the Land of Rising Sun?",
+        options: ["India", "Japan", "China", "Thailand"],
+        answer: "Japan",
+      },
+      {
+        text: "Which is the largest planet in our solar system?",
+        options: ["Earth", "Jupiter", "Saturn", "Neptune"],
+        answer: "Jupiter",
+      },
+      {
+        text: "Which is the main source of energy for Earth?",
+        options: ["Moon", "Sun", "Stars", "Wind"],
+        answer: "Sun",
+      },
+      {
+        text: "Which is the national flower of India?",
+        options: ["Rose", "Lotus", "Sunflower", "Lily"],
+        answer: "Lotus",
+      },
+      {
+        text: "Which metal is liquid at room temperature?",
+        options: ["Iron", "Mercury", "Copper", "Aluminium"],
+        answer: "Mercury",
+      },
+
+    ];
+
+    // ➗ MATH QUESTION
+    const a = Math.floor(Math.random() * 10) + 1;
+    const b = Math.floor(Math.random() * 10) + 1;
+
+    const ops = ["+", "-", "×", "÷"];
+    const op = ops[Math.floor(Math.random() * ops.length)];
+
+    let mathQuestion = null;
+
+    if (op === "+") {
+      mathQuestion = {
+        text: `${a} + ${b} = ?`,
+        answer: a + b,
+      };
+    }
+
+    if (op === "-") {
+      mathQuestion = {
+        text: `${a} - ${b} = ?`,
+        answer: a - b,
+      };
+    }
+
+    if (op === "×") {
+      mathQuestion = {
+        text: `${a} × ${b} = ?`,
+        answer: a * b,
+      };
+    }
+
+    if (op === "÷") {
+      const product = a * b;
+      mathQuestion = {
+        text: `${product} ÷ ${a} = ?`,
+        answer: b,
+      };
+    }
+
+
+    // 🎯 FINAL PICK
+    if (type === "math") {
+      return {
+        type: "math",
+        ...mathQuestion,
+      };
+    } else {
+      const q = gkQuestions[Math.floor(Math.random() * gkQuestions.length)];
+      return {
+        type: "gk",
+        ...q,
+      };
+    }
+  };
 
   // 💥 CLICK (UPDATED WITH PARTICLES)
   const handleBalloonClick = (id) => {
@@ -599,7 +598,7 @@ const generateQuestion = () => {
 
     popSound.current.currentTime = 0.5;
     popSound.current.volume = 0.5;
-    popSound.current.play().catch(() => {});
+    popSound.current.play().catch(() => { });
     createSpecialParticles(clicked.type, clicked.x, clicked.y);
 
     if (clicked.type === "bomb") {
@@ -610,7 +609,7 @@ const generateQuestion = () => {
     let add = 1;
     if (clicked.type === "blue") add = 2;
 
-      if (!isBattle) {
+    if (!isBattle) {
       setScore((p) => p + add);
     } else {
       if (activePlayer === 1) {
@@ -622,26 +621,26 @@ const generateQuestion = () => {
       }
     }
     if (Math.random() < 0.3) {
-    const q = generateQuestion();
-    setQuestion(q);
-    setShowQuestion(true);
-    setPaused(true);
-  }
+      const q = generateQuestion();
+      setQuestion(q);
+      setShowQuestion(true);
+      setPaused(true);
+    }
 
     //  PARTICLE BURST
     setParticles((prev) => [
-  ...prev,
-  ...Array.from({ length: 10 }, () => ({
-    id: Math.random(),
-    x: clicked.x,
-    y: clicked.y,
-    vx: (Math.random() - 0.5) * 6,
-    vy: (Math.random() - 0.5) * 6,
-    life: 1,
-    emoji: getCharacterEffect(),
-  })),
-]);
-    
+      ...prev,
+      ...Array.from({ length: 10 }, () => ({
+        id: Math.random(),
+        x: clicked.x,
+        y: clicked.y,
+        vx: (Math.random() - 0.5) * 6,
+        vy: (Math.random() - 0.5) * 6,
+        life: 1,
+        emoji: getCharacterEffect(),
+      })),
+    ]);
+
     setBalloons((prev) =>
       prev.map((b) =>
         b.id === id ? { ...b, popping: true } : b
@@ -671,287 +670,257 @@ const generateQuestion = () => {
     return () => clearInterval(interval);
   }, []);
 
-//floating point for correct ans
-const handleCorrectAnswer = () => {
-  setScore((p) => p + 2);
+  //floating point for correct ans
+  const handleCorrectAnswer = () => {
+    setScore((p) => p + 2);
 
-  showFloatingText("+2 🎉");
 
-  if (correctSound.current) {
-    correctSound.current.currentTime = 0;
-    correctSound.current.volume = 0.7;
-    correctSound.current.play().catch(() => {});
+
+    if (correctSound.current) {
+      correctSound.current.currentTime = 0;
+      correctSound.current.volume = 0.7;
+      correctSound.current.play().catch(() => { });
+    }
+    if (wrongSound.current) {
+      wrongSound.current.pause();
+      wrongSound.current.currentTime = 0;
+    }
   }
-  if (wrongSound.current) {
-  wrongSound.current.pause();
-  wrongSound.current.currentTime = 0;
-}
-}
-  
 
 
-return (
-  <div
-  className="game"
-  style={{
-    position: "relative",
-    height: screenHeight,
-    width: "100vw",
-    transform: shake ? "translate(5px,5px)" : "none",
-    touchAction: "manipulation",
-    overflow: "hidden",
-    userSelect: "none",
-    WebkitUserSelect: "none",
-  }}
->
-    <h1>🎈 Balloon Pop Game </h1>
 
-    {/* HUD */}
-    <div className="hud" style={{
+  return (
+    <div
+      className="game"
+      style={{
+        position: "relative",
+        height: screenHeight,
+        width: "100vw",
+        transform: shake ? "translate(5px,5px)" : "none",
+        touchAction: "manipulation",
+        overflow: "hidden",
+        userSelect: "none",
+        WebkitUserSelect: "none",
+      }}
+    >
+      <h1>🎈 Balloon Pop Game </h1>
+
+      {/* HUD */}
+      <div className="hud" style={{
         display: "flex",
         flexWrap: "wrap",
         justifyContent: "center",
         gap: "6px",
         padding: "8px",
       }}
-    >
-      {!isBattle ? (
-        <div className="hud-box" style={{
-          fontSize: isMobile ? "12px" : "18px",
-          padding: isMobile ? "6px 10px" : "10px 14px",
-        
-        }}>🎯 Score: {score}</div>
-      ) : (
-        <>
-          <div className="hud-box">🔴 Player 1: {player1Score}</div>
-          <div className="hud-box">🔵 Player 2: {player2Score}</div>
-          <div className="hud-box">
-            Turn: {activePlayer === 1 ? "🔴 Player 1" : "🔵 Player 2"}
-          </div>
-        </>
+      >
+        {!isBattle ? (
+          <div className="hud-box" style={{
+            fontSize: isMobile ? "12px" : "18px",
+            padding: isMobile ? "6px 10px" : "10px 14px",
+
+          }}>🎯 Score: {score}</div>
+        ) : (
+          <>
+            <div className="hud-box">🔴 Player 1: {player1Score}</div>
+            <div className="hud-box">🔵 Player 2: {player2Score}</div>
+            <div className="hud-box">
+              Turn: {activePlayer === 1 ? "🔴 Player 1" : "🔵 Player 2"}
+            </div>
+          </>
+        )}
+
+        <div className="hud-box">❤️ Lives: {lives}</div>
+        <div className="hud-box">⏰ {time}s</div>
+
+        <button
+          className="hud-box"
+          onClick={() => setPaused(!paused)}
+        >
+          {paused ? "▶ Resume" : "⏸ Pause"}
+        </button>
+      </div>
+
+      {/* GAME OVER */}
+      {gameOver && (
+        <div className="game-over-box">
+          <h2>🏆 Game Over</h2>
+
+          {!isBattle ? (
+            <h3>Your Score: {score}</h3>
+          ) : (
+            <>
+              <h3>🔴 Player 1: {player1Score}</h3>
+              <h3>🔵 Player 2: {player2Score}</h3>
+
+              <h2>
+                {player1Score > player2Score
+                  ? "🎉 Player 1 Wins!"
+                  : player2Score > player1Score
+                    ? "🎉 Player 2 Wins!"
+                    : "🤝 Draw!"}
+              </h2>
+            </>
+          )}
+
+          <button
+            className="play-btn"
+            onClick={() => window.location.reload()}
+          >
+            Play Again
+          </button>
+        </div>
       )}
 
-      <div className="hud-box">❤️ Lives: {lives}</div>
-      <div className="hud-box">⏰ {time}s</div>
+      {/* BALLOONS */}
+      {!gameOver &&
+        balloons.map((b) => (
+          <div
+            key={b.id}
+            onPointerDown={() => handleBalloonClick(b.id)}
+            style={{
+              position: "absolute",
+              left: b.x,
+              top: b.y,
+              fontSize: isMobile ? "45px" : "80px",
+              cursor: "pointer",
+              transition: "transform 0.2s",
+              transform: b.popping ? "scale(1.5)" : "scale(1)",
+              opacity: b.popping ? 0 : 1,
+            }}
+          >
+            {getEmoji(b.type)}
+          </div>
+        ))}
 
-      <button
-        className="hud-box"
-        onClick={() => setPaused(!paused)}
-      >
-        {paused ? "▶ Resume" : "⏸ Pause"}
-      </button>
-    </div>
-
-    {/* GAME OVER */}
-    {gameOver && (
-  <div className="game-over-box">
-    <h2>🏆 Game Over</h2>
-
-    {!isBattle ? (
-      <h3>Your Score: {score}</h3>
-    ) : (
-      <>
-        <h3>🔴 Player 1: {player1Score}</h3>
-        <h3>🔵 Player 2: {player2Score}</h3>
-
-        <h2>
-          {player1Score > player2Score
-            ? "🎉 Player 1 Wins!"
-            : player2Score > player1Score
-            ? "🎉 Player 2 Wins!"
-            : "🤝 Draw!"}
-        </h2>
-      </>
-    )}
-
-    <button
-      className="play-btn"
-      onClick={() => window.location.reload()}
-    >
-      Play Again
-    </button>
-  </div>
-)}
-
-    {/* BALLOONS */}
-    {!gameOver &&
-      balloons.map((b) => (
+      {/* ⭐ PARTICLES */}
+      {particles.map((p) => (
         <div
-          key={b.id}
-          onPointerDown={() => handleBalloonClick(b.id)}
+          key={p.id}
           style={{
             position: "absolute",
-            left: b.x,
-            top: b.y,
-            fontSize: isMobile ? "45px" : "80px",
-            cursor: "pointer",
-            transition: "transform 0.2s",
-            transform: b.popping ? "scale(1.5)" : "scale(1)",
-            opacity: b.popping ? 0 : 1,
+            left: p.x,
+            top: p.y,
+            fontSize: isMobile ? "14px" : "20px",
+            pointerEvents: "none",
+            opacity: p.life,
           }}
         >
-          {getEmoji(b.type)}
+          {p.emoji || p.icon || "💥"}
         </div>
       ))}
 
-    {/* ⭐ PARTICLES */}
-    {particles.map((p) => (
-      <div
-        key={p.id}
-        style={{
-          position: "absolute",
-          left: p.x,
-          top: p.y,
-          fontSize: isMobile ? "14px" : "20px",
-          pointerEvents: "none",
-          opacity: p.life,
-        }}
-      >
-        {p.emoji || p.icon || "💥"}
-      </div>
-    ))}
-
-    {/* SIDE EMOJIS */}
-    {sideEmojis.map((e) => (
-      <div
-        key={e.id}
-        style={{
-          position: "absolute",
-          left: e.x,
-          top: e.y,
-          fontSize: isMobile ? "25px" : "40px",
-          pointerEvents: "none",
-          zIndex: 1,
-        }}
-      >
-        {e.emoji}
-      </div>
-    ))}
-
-    {/* PAUSE MENU */}
-    {paused && !showQuestion && (
-      <div className="pause-menu">
-        <h2>⏸ Game Paused</h2>
-
-        <button
-          className="play-btn"
-          onClick={() => setPaused(false)}
-        >
-          ▶ Resume
-        </button>
-
-        <button
-          className="play-btn"
-          onClick={() => window.location.reload()}
-        >
-          🔄 Restart
-        </button>
-      </div>
-    )}
-
-    {/* QUESTION BOX */}
-    {showQuestion && (
-              <div className="question-box">
-                <h2>
-                  {question.type === "math"
-                    ? "🧮 Math Challenge"
-                    : "🧠 GK Challenge"}
-                </h2>
-
-                <h3>{question.text}</h3>
-                <div className="options">
-          {question.type === "gk" ? (
-            <>
-              {question.options.map((opt, i) => (
-                <button
-                  key={i}
-                  className="option-btn"
-                  onClick={() => setSelectedOption(opt)}
-                >
-                  {opt}
-                </button>
-              ))}
-
-              <button
-                className="play-btn"
-                onClick={() => {
-                  if (selectedOption === question.answer) {
-                     handleCorrectAnswer();
-                  }else {
-                    handleWrongAnswer();
-                  }
-
-                  setSelectedOption("");
-                  setShowQuestion(false);
-                  setPaused(false);
-                }}
-              >
-                Submit
-              </button>
-            </>
-          ) : (
-            <>
-          <input
-                type="number"
-                value={mathInput}
-                placeholder="Your answer"
-                onChange={(e) => setMathInput(e.target.value)}
-              />
-
-              <button
-                className="play-btn"
-                onClick={() => {
-                  if (Number(mathInput) === question.answer) {
-                    handleCorrectAnswer();
-                  }else {
-                    handleWrongAnswer();
-                  }
-
-
-                  setMathInput("");
-                  setShowQuestion(false);
-                  setPaused(false);
-                }}
-              >
-                Submit
-              </button>
-            </>
-          )}
-        </div>
-        {floatingText.length > 0 && (
+      {/* SIDE EMOJIS */}
+      {sideEmojis.map((e) => (
         <div
+          key={e.id}
           style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            zIndex: 999999999,
+            position: "absolute",
+            left: e.x,
+            top: e.y,
+            fontSize: isMobile ? "25px" : "40px",
             pointerEvents: "none",
+            zIndex: 1,
           }}
         >
-          {floatingText.map((t) => (
-            <div
-              key={t.id}
-              style={{
-                position: "absolute",
-                left: "50%",
-                top: "50%",
-                transform: "translate(-50%, -50%)",
-                fontSize: t.small ? "30px" : (isMobile ? "40px" : "60px"),
-                color: t.small ? "red" : "gold",
-                textShadow: t.small ? "0 0 10px red" : "0 0 15px gold",
-                background: "black",
-              }}
-            >
-              {t.text}
-            </div>
-          ))}
+          {e.emoji}
+        </div>
+      ))}
+
+      {/* PAUSE MENU */}
+      {paused && !showQuestion && (
+        <div className="pause-menu">
+          <h2>⏸ Game Paused</h2>
+
+          <button
+            className="play-btn"
+            onClick={() => setPaused(false)}
+          >
+            ▶ Resume
+          </button>
+
+          <button
+            className="play-btn"
+            onClick={() => window.location.reload()}
+          >
+            🔄 Restart
+          </button>
         </div>
       )}
-      </div>
-    )}
 
-  </div>
-);
+      {/* QUESTION BOX */}
+      {showQuestion && (
+        <div className="question-box">
+          <h2>
+            {question.type === "math"
+              ? "🧮 Math Challenge"
+              : "🧠 GK Challenge"}
+          </h2>
+
+          <h3>{question.text}</h3>
+          <div className="options">
+            {question.type === "gk" ? (
+              <>
+                {question.options.map((opt, i) => (
+                  <button
+                    key={i}
+                    className="option-btn"
+                    onClick={() => setSelectedOption(opt)}
+                  >
+                    {opt}
+                  </button>
+                ))}
+
+                <button
+                  className="play-btn"
+                  onClick={() => {
+                    if (selectedOption === question.answer) {
+                      handleCorrectAnswer();
+                    } else {
+                      handleWrongAnswer();
+                    }
+
+                    setSelectedOption("");
+                    setShowQuestion(false);
+                    setPaused(false);
+                  }}
+                >
+                  Submit
+                </button>
+              </>
+            ) : (
+              <>
+                <input
+                  type="number"
+                  value={mathInput}
+                  placeholder="Your answer"
+                  onChange={(e) => setMathInput(e.target.value)}
+                />
+
+                <button
+                  className="play-btn"
+                  onClick={() => {
+                    if (Number(mathInput) === question.answer) {
+                      handleCorrectAnswer();
+                    } else {
+                      handleWrongAnswer();
+                    }
+
+
+                    setMathInput("");
+                    setShowQuestion(false);
+                    setPaused(false);
+                  }}
+                >
+                  Submit
+                </button>
+              </>
+            )}
+          </div>
+            
+        </div>
+      )}
+
+    </div>
+  );
 }
