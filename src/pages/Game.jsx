@@ -33,7 +33,7 @@ export default function Game({ mode,character }) {
   const correctSound = useRef(null);
   const wrongSound = useRef(null);
 
-
+  if (time <= 0) setGameOver(true);
 //screen heightt on all devices
 useEffect(() => {
   const handleResize = () => {
@@ -169,17 +169,30 @@ const createSpecialParticles = (type, x, y) => {
 };
 
 
+const winner =
+  player1Score > player2Score
+    ? "Player 1"
+    : player2Score > player1Score
+    ? "Player 2"
+    : "Draw";
+
   // ⏱ TIMER
   useEffect(() => {
-    if (time <= 0) setGameOver(true);
+  if (gameOver || paused) return;
 
-    const timer = setInterval(() => {
-      setTime((p) => p - 1);
-    }, 1000);
+  const timer = setInterval(() => {
+    setTime((p) => {
+      if (p <= 1) {
+        clearInterval(timer);
+        setGameOver(true);
+        return 0;
+      }
+      return p - 1;
+    });
+  }, 1000);
 
-    return () => clearInterval(timer);
-  }, [time]);
-
+  return () => clearInterval(timer);
+}, [gameOver, paused]);
 
 
   // ❤️ LIVES
@@ -731,18 +744,34 @@ return (
 
     {/* GAME OVER */}
     {gameOver && (
-      <div className="game-over-box">
-        <h2>🏆 Game Over</h2>
-        <h3>Your Score: {score}</h3>
+  <div className="game-over-box">
+    <h2>🏆 Game Over</h2>
 
-        <button
-          className="play-btn"
-          onClick={() => window.location.reload()}
-        >
-          Play Again
-        </button>
-      </div>
+    {!isBattle ? (
+      <h3>Your Score: {score}</h3>
+    ) : (
+      <>
+        <h3>🔴 Player 1: {player1Score}</h3>
+        <h3>🔵 Player 2: {player2Score}</h3>
+
+        <h2>
+          {player1Score > player2Score
+            ? "🎉 Player 1 Wins!"
+            : player2Score > player1Score
+            ? "🎉 Player 2 Wins!"
+            : "🤝 Draw!"}
+        </h2>
+      </>
     )}
+
+    <button
+      className="play-btn"
+      onClick={() => window.location.reload()}
+    >
+      Play Again
+    </button>
+  </div>
+)}
 
     {/* BALLOONS */}
     {!gameOver &&
